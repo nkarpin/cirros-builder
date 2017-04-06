@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+set -x
+
+BUILDROOT_VER="2015.05"
+BUILDROOT_URL="http://buildroot.uclibc.org/downloads/buildroot-${BUILDROOT_VER}.tar.gz"
+KERNEL_VER="3.19.0-20.20~14.04.1"
+GRUB_VER="2.02~beta2-36ubuntu8"
+OUTPUT_DIR="/opt/images"
+ARCH="x86_64"
+#BUILD_TRUNK=true
+
+
+#prepare environment
+./bin/system-setup
+apt-get install python grub-common -y
+
+# download and build buildroot
+mkdir -p ../download
+ln -snf ../download download
+wget -P download "${BUILDROOT_URL}"
+tar -xvf download/buildroot-"${BUILDROOT_VER}".tar.gz
+ln -snf buildroot-"${BUILDROOT_VER}" buildroot
+pushd buildroot
+  QUILT_PATCHES=./../patches-buildroot quilt push -a
+popd
+make ARCH="${ARCH}" br-source
+make ARCH="${ARCH}" OUT_D=/opt/images
+
+#TODO: this code is incompatible with cirros src tags =<0.3.5,
+# it works on cirros trunk, need to think about compatibility with tags
+./bin/grab-kernels "${KERNEL_VER}" "${ARCH}"
+./bin/grab-grub-efi "${GRUB_VER}" "${ARCH}"
+./bin/bundle -v --arch="${ARCH}" "${OUTPUT_DIR}"/rootfs.tar \
+download/kernel-"${ARCH}".deb download/grub-efi-${ARCH}.tar.gz "${OUTPUT_DIR}"
