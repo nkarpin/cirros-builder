@@ -10,4 +10,4 @@ COPY src-cirros /opt/build/
 
 RUN apt-get update && apt-get install python grub-common -y
 
-CMD cd /opt/build && build-cirros
+CMD build-cirros /opt/build

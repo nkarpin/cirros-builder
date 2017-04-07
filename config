@@ -1,0 +1,6 @@
+BUILDROOT_VER=2015.05
+BUILDROOT_URL=http://buildroot.uclibc.org/downloads/buildroot-2015.05.tar.gz
+KERNEL_VER=3.2.0-80.116
+GRUB_VER=2.02~beta2-36ubuntu8
+ARCH=x86_64
+OUTPUT_DIR=/opt/images
