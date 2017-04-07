@@ -5,4 +5,9 @@ MAINTAINER Mykyta Karpin <nkarpin1991@gmail.com>
 COPY build-cirros /usr/bin/
 RUN chmod +x /usr/bin/build-cirros
 
-CMD ( cd /opt/build/ && build-cirros )
+RUN mkdir /opt/build
+COPY src-cirros /opt/build/
+
+RUN apt-get update && apt-get install python grub-common -y
+
+CMD cd /opt/build && build-cirros
