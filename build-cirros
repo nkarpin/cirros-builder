@@ -38,4 +38,4 @@ make ARCH="${ARCH}" OUT_D=/opt/images
 ./bin/grab-kernels "${KERNEL_VER}" "${ARCH}"
 ./bin/grab-grub-efi "${GRUB_VER}" "${ARCH}"
 ./bin/bundle -v --arch="${ARCH}" "${OUTPUT_DIR}"/rootfs.tar \
-download/kernel-"${ARCH}".deb download/grub-efi-${ARCH}.tar.gz "${OUTPUT_DIR}"
+download/kernel-"${ARCH}".deb download/grub-efi-"${ARCH}".tar.gz "${OUTPUT_DIR}"
