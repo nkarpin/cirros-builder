@@ -8,6 +8,6 @@ RUN chmod +x /usr/bin/build-cirros
 RUN mkdir /opt/build
 COPY src-cirros /opt/build/
 
-RUN apt-get update && apt-get install python grub-common -y
+RUN apt-get update && apt-get install python grub-common git -y
 
 CMD build-cirros /opt/build
