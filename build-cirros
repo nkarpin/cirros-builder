@@ -15,6 +15,7 @@ KERNEL_VER="${KERNEL_VER:-3.19.0-20.20~14.04.1}"
 GRUB_VER="${GRUB_VER:-2.02~beta2-36ubuntu8}"
 ARCH="${ARCH:-x86_64}"
 OUTPUT_DIR="${OUTPUT_DIR:-/opt/images}"
+IMAGE_SIZE="${IMAGE_SIZE:-24M}"
 
 #prepare environment
 cd "${BUILD_DIR}"
@@ -43,6 +44,6 @@ if [ -n "${GRAB_GRUB}" ]; then
   GRUB_TAR="download/grub-efi-${ARCH}.tar.gz"
 fi
 
-bundle_args=(-v --arch=${ARCH} ${OUTPUT_DIR}/rootfs.tar download/kernel-${ARCH}.deb ${GRUB_TAR} ${OUTPUT_DIR})
+bundle_args=(-v --arch=${ARCH} --size=${IMAGE_SIZE} ${OUTPUT_DIR}/rootfs.tar download/kernel-${ARCH}.deb ${GRUB_TAR} ${OUTPUT_DIR})
 
 ./bin/bundle "${bundle_args[@]}"
