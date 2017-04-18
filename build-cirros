@@ -11,16 +11,27 @@ fi
 
 BUILDROOT_VER="${BUILDROOT_VER:-2015.05}"
 BUILDROOT_URL="${BUILDROOT_URL:-http://buildroot.uclibc.org/downloads/buildroot-${BUILDROOT_VER}.tar.gz}"
-KERNEL_VER="${KERNEL_VER:-3.19.0-20.20~14.04.1}"
-GRUB_VER="${GRUB_VER:-2.02~beta2-36ubuntu8}"
 ARCH="${ARCH:-x86_64}"
-OUTPUT_DIR="${OUTPUT_DIR:-/opt/images}"
-IMAGE_SIZE="${IMAGE_SIZE:-24M}"
+OUT_DIR="${OUT_DIR:-/opt/build_artifacts}"
+OUT_IMG_DIR="${OUT_IMG_DIR:-/opt/images}"
+IMG_SIZE="${IMG_SIZE:-24M}"
+BASE_DISTR="${BASE_DISTR:-u14.04}"
+
+# version like 3.13.0-52.86
+#              3.19.0-20.20~14.04.1
+KVER=${KVER:-3.19.0-20.20}
+kpart=${KVER%-*}
+upart=${KVER#*-}
+abi=${upart%%.*}
+
+OUT_IMG_FILE="${OUT_IMG_DIR}/cirros-${BASE_DISTR}-kver-${kpart}-${abi}-${ARCH}-disk.img"
 
 #prepare environment
 cd "${BUILD_DIR}"
 ./bin/system-setup
 apt-get install python grub-common git -y
+mkdir -p "${OUT_DIR}"
+mkdir -p "${OUT_IMG_DIR}"
 
 # download and build buildroot
 mkdir -p ../download
@@ -32,18 +43,21 @@ pushd buildroot
   QUILT_PATCHES=./../patches-buildroot quilt push -a
 popd
 make ARCH="${ARCH}" br-source
-make ARCH="${ARCH}" OUT_D=/opt/images
+make ARCH="${ARCH}" OUT_D="${OUT_DIR}"
 
 #TODO: this code is incompatible with cirros src tags =<0.3.5,
 # it works on cirros trunk, need to think about compatibility with tags
-./bin/grab-kernels "${KERNEL_VER}" "${ARCH}"
+./bin/grab-kernels "${KVER}" "${ARCH}"
 
 # grab-grub-* scripts are available in trunk (after 0.3.5)
 if [ -n "${GRAB_GRUB}" ]; then
   ./bin/grab-grub-efi "${GRUB_VER}" "${ARCH}"
+  GRUB_VER="${GRUB_VER:-2.02~beta2-36ubuntu8}"
   GRUB_TAR="download/grub-efi-${ARCH}.tar.gz"
 fi
 
-bundle_args=(-v --arch=${ARCH} --size=${IMAGE_SIZE} ${OUTPUT_DIR}/rootfs.tar download/kernel-${ARCH}.deb ${GRUB_TAR} ${OUTPUT_DIR})
+bundle_args=(-v --arch=${ARCH} --size=${IMG_SIZE} ${OUT_DIR}/rootfs.tar download/kernel-${ARCH}.deb ${GRUB_TAR} ${OUT_DIR})
 
 ./bin/bundle "${bundle_args[@]}"
+
+cp "${OUT_DIR}/disk.img" "${OUT_IMG_FILE}"
